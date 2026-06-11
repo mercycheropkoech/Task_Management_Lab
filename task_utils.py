@@ -1,12 +1,11 @@
-from datetime import datetime
-
-from task_manager.validation import (
+from validation import (
     validate_task_title,
     validate_task_description,
     validate_due_date
 )
 
 tasks = []
+
 
 def add_task(title, description, due_date):
     valid_title, msg1 = validate_task_title(title)
@@ -22,14 +21,13 @@ def add_task(title, description, due_date):
     if not valid_date:
         return msg3
 
-    task = {
+    tasks.append({
         "title": title,
         "description": description,
         "due_date": due_date,
         "status": "pending"
-    }
+    })
 
-    tasks.append(task)
     return "Task added successfully!"
 
 
@@ -43,10 +41,6 @@ def mark_task_as_complete(index, tasks=tasks):
 
 def view_pending_tasks(tasks=tasks):
     pending = [t for t in tasks if t["status"] == "pending"]
-
-    if len(pending) == 0:
-        return []
-
     return pending
 
 
