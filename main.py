@@ -1,55 +1,24 @@
-from task_utils import (
-    add_task,
-    mark_task_as_complete,
-    view_pending_tasks,
-    calculate_progress,
-    tasks
-)
+from task_utils import add_task, mark_task_as_complete, view_pending_tasks, calculate_progress
 
 
-def main():
-    while True:
-        print("\nTask Management System")
-        print("1. Add Task")
-        print("2. Mark Task as Complete")
-        print("3. View Pending Tasks")
-        print("4. View Progress")
-        print("5. Exit")
+while True:
+    choice = input()
 
-        choice = input("Enter your choice (1-5): ")
+    if choice == "1":
+        title = input()
+        description = input()
+        due_date = input()
+        add_task(title, description, due_date)
 
-        if choice == "1":
-            title = input("Enter task title: ")
-            description = input("Enter task description: ")
-            due_date = input("Enter due date (YYYY-MM-DD): ")
+    elif choice == "2":
+        index = int(input())
+        mark_task_as_complete(index)
 
-            print(add_task(title, description, due_date))
+    elif choice == "3":
+        view_pending_tasks()
 
-        elif choice == "2":
-            try:
-                index = int(input("Enter task index: "))
-                print(mark_task_as_complete(index))
-            except ValueError:
-                print("Invalid input. Enter a number.")
+    elif choice == "4":
+        calculate_progress()
 
-        elif choice == "3":
-            pending = view_pending_tasks()
-            if not pending:
-                print("No pending tasks")
-            else:
-                for i, task in enumerate(pending):
-                    print(f"{i}. {task['title']} - {task['due_date']}")
-
-        elif choice == "4":
-            print(f"Progress: {calculate_progress():.2f}%")
-
-        elif choice == "5":
-            print("Exiting the program...")
-            break
-
-        else:
-            print("Invalid choice. Try again.")
-
-
-if __name__ == "__main__":
-    main()
+    elif choice == "5":
+        break
