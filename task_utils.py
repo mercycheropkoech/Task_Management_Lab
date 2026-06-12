@@ -1,60 +1,68 @@
-from validation import validate_task_title, validate_task_description, validate_due_date
-tasks = []
-
+try:
+    from task_manager.validation import validate_task_title, validate_task_description, validate_due_date
+except ModuleNotFoundError:
+    from validation import validate_task_title, validate_task_description, validate_due_date
 
 def add_task(title, description, due_date):
-    valid_title, msg1 = validate_task_title(title)
-    valid_desc, msg2 = validate_task_description(description)
-    valid_date, msg3 = validate_due_date(due_date)
+    """Create a validated task dictionary."""
+    if not validate_task_title(title):
+        print("Task title is required.")
+        return None
+    if not validate_task_description(description):
+        print("Task description is required.")
+        return None
+    if not validate_due_date(due_date):
+        print("Task due date must be in YYYY-MM-DD format.")
+        return None
 
-    if not valid_title:
-        print(msg1)
-        return
-
-    if not valid_desc:
-        print(msg2)
-        return
-
-    if not valid_date:
-        print(msg3)
-        return
-
-    tasks.append({
-        "title": title,
-        "description": description,
+    task = {
+        "title": title.strip(),
+        "description": description.strip(),
         "due_date": due_date,
-        "status": "pending"
-    })
-
+        "completed": False
+    }
     print("Task added successfully!")
+    return task
 
 
-def mark_task_as_complete(index, tasks=tasks):
-    if index < 0 or index >= len(tasks):
-        print("Invalid task index")
-        return
+def mark_task_as_complete(selection, tasks):
+    """Mark a pending task as complete by its displayed number."""
+    try:
+        selection = int(selection)
+    except ValueError:
+        print("Please enter a valid number")
+        return False
 
-    tasks[index]["status"] = "completed"
-    print("Task marked as complete!")
+    pending_indices = [i for i, task in enumerate(tasks) if not task["completed"]]
+    if 1 <= selection <= len(pending_indices):
+        task_index = pending_indices[selection - 1]
+        tasks[task_index]["completed"] = True
+        print("Task marked as complete!")
+        return True
+
+    print("Invalid task number")
+    return False
 
 
-def view_pending_tasks(tasks=tasks):
-    pending = [t for t in tasks if t["status"] == "pending"]
+def view_pending_tasks(tasks):
+    """Display all pending tasks."""
+    pending_indices = [i for i, task in enumerate(tasks) if not task["completed"]]
+    if not pending_indices:
+        print("No pending tasks!")
+        return pending_indices
 
-    if len(pending) == 0:
-        print("No pending tasks")
-        return
+    for number, task_index in enumerate(pending_indices, start=1):
+        task = tasks[task_index]
+        print(f"{number}. {task['title']} | Due: {task['due_date']}")
+        if task["description"]:
+            print(f"  {task['description']}")
+    return pending_indices
 
-    for task in pending:
-        print(f"{task['title']} - {task['due_date']}")
 
-
-def calculate_progress(tasks=tasks):
-    if len(tasks) == 0:
-        print("0%")
-        return
-
-    completed = len([t for t in tasks if t["status"] == "completed"])
-    progress = (completed / len(tasks)) * 100
-
-    print(f"{progress:.2f}%")
+def calculate_progress(tasks):
+    """Calculate and return the completed task progress as a float."""
+    if not tasks:
+        return 0.0
+    total = len(tasks)
+    completed = sum(1 for task in tasks if task["completed"])
+    return (completed / total) * 100.0
